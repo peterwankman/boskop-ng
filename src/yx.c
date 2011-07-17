@@ -89,7 +89,7 @@ void timer(unsigned long ts) {
           now.tm_hour = 18 + now.tm_min / 60;
           now.tm_min %= 60;
         } else {
-          if (rrand(5) == 1) {
+          if (rrand(7) < 5) {
             cur_state = YX_KDF;
             irc_privmsg(chan, "ersma was kraft durch freude");
           } else {
@@ -172,7 +172,7 @@ int init(void) {
   localtime_r((time_t*)&t, &now);
   
   if (now.tm_hour >= 20 || now.tm_hour < 6) {
-    cur_state = YX_AMF;
+    cur_state = YX_KDF;
     now.tm_hour = 6;
     now.tm_min = rrand(20);
   } else if (now.tm_hour >= 11 && now.tm_hour < 18) {
