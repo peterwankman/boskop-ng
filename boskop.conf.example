@@ -1,0 +1,181 @@
+# Boskop NG configuration file
+
+core {
+   nick: boskopmann;
+   user: boskop;
+   realname: "Boskop NG";
+   port: 6667;
+   server: irc.quakenet.org;
+
+   module: join.so;
+#   module: weil.so;
+   module: invite.so;
+   module: talk.so;
+   module: quit.so;
+   module: blinddate.so;
+   module: tourette.so;
+   module: hello.so;
+   module: version.so;
+#   module: qauth.so;
+#   module: horde.so;
+#   module: jukebox.so;
+#   module: love.so;
+   module: auth.so;
+   module: ping.so;
+   module: nick.so;
+   module: decide.so;
+   module: alignment.so;
+   module: sercz.so;
+   module: quote.so;
+#   module: rss.so;
+#   module: search.so;
+   module: reminder.so;
+#   module: eliza.so;
+#   module: weather.so;
+   module: plugin.so;
+#   module: nickserv.so;
+   module: achtball.so;
+   module: fortune.so;
+   module: help.so;
+}
+
+join.so {
+   channel: #boskopdev;
+}
+
+weil.so {
+   dbfile: weil.txt;
+   interval: 10;
+   odds: 100;
+}
+
+auth.so {
+   salt: "geheim";
+   dbfile: auth.db;
+}
+
+blinddate.so {
+   greet: "hallo";
+   greet: "hi";
+   greet: "hey ich wollte dich mal was fragen";
+   greet: "kennen wir uns nicht irgendwoher?";
+}
+
+tourette.so {
+   word: hitler;
+   word: fotze;
+   word: nutte;
+   word: sack;
+   word: schwanz;
+   word: penis;
+   word: hure;
+}
+
+hello.so {
+   trigger: "/^hi( .*)?$/i";
+   trigger: "/^hallo( .*)?$/i";
+   trigger: "/^ser(vu)?s( .*)?$/i";
+   trigger: "/^moin(sen)?( .*)?$/i";
+   trigger: "/^hola( .*)?$/i";
+   trigger: "/^hey(ho)?( .*)?$/i";
+   trigger: "/^tach( .*)?$/i";
+   trigger: "/^guten (tag|morgen|abend)$/i";
+   reply: ">8< spider pride";
+   reply: "Bonjour monsieur";
+   reply: "Hola amigo! Como está?";
+   interval: 10;
+   odds: 100;
+}
+
+qauth.so {
+   user: user;
+   pass: pass;
+   mode: simple;
+}
+
+
+horde.so {
+   channel: #boskophorde;
+   key: secret;
+}
+
+jukebox.so {
+   text: "Never gonna give you up";
+   text: "Never gonna let you down";
+   text: "Never gonna run around";
+   text: "And desert you";
+   text: "Never gonna make you cry";
+   text: "Never gonna say goodbye";
+   text: "Never gonna tell a lie";
+   text: "And hurt you";
+}
+
+love.so {
+   messages: "<3";
+   messages: "luv u";
+   messages: ":*";
+   messages: "hey baby";
+   messages: "<3 <3 <3";
+}
+
+decide.so {
+   maximum: 5;
+}
+
+rss.so {
+   source: "http://localhost/rss.xml";
+   target: "#boskopdev";
+}
+
+sercz.so {
+	interval: 10;
+	init: hallo;
+	init: morgen;
+
+	pain: leute;
+	pain: homies;
+
+	time: gestern;
+	time: heute;
+
+	what: nudeln;
+	what: kartoffeln;
+
+	sport: ausgespien;
+	sport: gegessen;
+
+	organ: "en hamster";
+	organ: "e mutter";
+
+	accid: erschreckt;
+	accid: belustigt;
+}
+
+search.so {
+   url:"http://en.wikipedia.org/w/api.php?action=opensearch&format=xml&search=";
+}
+
+scheme.so {
+   interval: 10;
+
+   city: muenchen;
+   city: berlin;
+}
+
+quote.so {
+   interval: 10;
+   dbfile: quote.db;
+}
+
+eliza.so {
+   knowledgefile: eliza.txt;
+}
+
+weather.so {
+   url: "http://www.google.com/ig/api?weather=";
+}
+
+nickserv.so {
+   hostmask: "NickServ!services@network";
+   credentials: "nickname/password";
+}
