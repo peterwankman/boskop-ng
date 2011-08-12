@@ -6,6 +6,7 @@ core {
    realname: "Boskop NG";
    port: 6667;
    server: irc.quakenet.org;
+   prefix: "!";
 
    module: join.so;
 #   module: weil.so;
@@ -179,3 +180,61 @@ nickserv.so {
    hostmask: "NickServ!services@network";
    credentials: "nickname/password";
 }
+
+yx.so {
+   channel: "#scheme";
+
+   reply: "kerker";
+   reply: "was? :<";
+   reply: "stell mal bier kalt";
+   reply: "bierli reingefüllt?";
+   reply: "dank UBANTO lunix";
+   reply: ";S";
+   reply: "danke";
+
+   talk: "ati ist toll";
+   talk: "kb mehr auf nv giev ati 5770";
+   talk: "卐 ATI 卐";
+   talk: "ATI ATI ATI";
+   talk: "wann gehen wir hodi besuchen? :D";
+   talk: ":E";
+   talk: "cataclysm is so die verarsche einfach";
+   talk: "bierzeit";
+   talk: "ich brauch noch en kasten bier";
+   talk: "gestern mal ausprobiert ;F";
+   talk: "smknight: du judenkönig";
+   talk: ":Γ";
+   talk: "ihr $tourettes";
+   talk: "bk enabled, brb";
+   talk: "train hard, go pro";
+   talk: ".choose 1 zwickel spezial";
+
+   pizza: "texmex pizza";
+   pizza: "pizza hawaii";
+   pizza: "salami pizza";
+   pizza: "pizza calzone";
+   pizza: "triple whopper";
+
+   topping: "ananas";
+   topping: "bonus käse";
+   topping: "mozarella";
+   topping: "zwiebeln";
+   topping: "kiwi";
+   topping: "bonus mozarella";   
+   topping: "anchovis";
+   topping: "peperoniwurst";
+   topping: "hackfleisch";
+   topping: "joghurt";
+   topping: "dreifach käse";
+
+   like: "kommt urgut";
+   like: "OM NOM NOM NOM";
+   like: "ist lecker";
+
+
+   recommend: "Mr. i7";
+   recommend: "AMD HD 6990";
+   recommend: "geforce 490";
+   recommend: "intel ssd 510";
+}
+

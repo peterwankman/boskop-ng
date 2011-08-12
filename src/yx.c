@@ -49,34 +49,35 @@ char *yx_state_str[] = {
   "KDF"
 };
 
-char *chan = "#scheme";
 
 enum yx_state cur_state;
 unsigned long change_state;
 
+int isyxchannel(const char *chan)
+{
+	int i, cnt;
+
+	cnt = config_getcnt("yx.so", "channel");
+
+	for (i = 0; i < cnt; ++i)
+		if (!strcasecmp(config_getn("yx.so", "channel", i), chan))
+			return 1;
+	return 0;
+}
+
+void yx_amsg(const char *msg)
+{
+	int i, cnt;
+
+	cnt = config_getcnt("yx.so", "channel");
+	for (i = 0; i < cnt; ++i)
+		irc_privmsg(config_getn("yx.so", "channel", i),
+			"%s", msg);
+}
+
 void timer(unsigned long ts) {
   struct tm now;
-  char *msg[] = {
-    "ati ist toll",
-    "kb mehr auf nv giev ati 5770",
-    "卐 ATI 卐",
-    "ATI ATI ATI",
-    "wann gehen wir hodi besuchen? :D",
-    ":E",
-    "aber ich werd mir cata anschaun",
-    "cataclysm is so die verarsche einfach",
-    "oh yeah ati catacylst 10.3 PREVIEW EDITION",
-    "bierzeit",
-    "ich brauch noch en kasten bier",
-    "gestern mal ausprobiert ;F",
-    "smknight: du judenkönig",
-    ":Γ",
-    "ihr $tourettes",
-    "texmex pizza mit thunfisch und gyros... und joghurt",
-    "bk enabled, brb",
-    "train hard, go pro",
-    ".choose 1 zwickel spezial",
-  };
+  int n, t, l, ccnt;
 
   if (ts > change_state) {
     (void)localtime_r((time_t*)&ts, &now);
@@ -84,17 +85,17 @@ void timer(unsigned long ts) {
       case YX_IRC:
         if (now.tm_hour < 14) {
           cur_state = YX_S3;
-          irc_privmsg(chan, "sor gn8bier und s3");
+          yx_amsg("sor gn8bier und s3");
           now.tm_min += rrand(23);
           now.tm_hour = 18 + now.tm_min / 60;
           now.tm_min %= 60;
         } else {
           if (rrand(7) < 5) {
             cur_state = YX_KDF;
-            irc_privmsg(chan, "ersma was kraft durch freude");
+            yx_amsg("ersma was kraft durch freude");
           } else {
             cur_state = YX_AMF;
-            irc_privmsg(chan, "bald arbeit macht frei modus :<");
+            yx_amsg("bald arbeit macht frei modus :<");
           }
           now.tm_min = rrand(20);
           now.tm_hour = 6;
@@ -102,7 +103,7 @@ void timer(unsigned long ts) {
         break;
       case YX_S3:
         cur_state = YX_IRC;
-        irc_privmsg(chan, "hulla");
+        yx_amsg("hulla");
         now.tm_min = rrand(10);
         now.tm_hour = 20;
         break;
@@ -119,34 +120,54 @@ void timer(unsigned long ts) {
     if (change_state <= ts)
       change_state += 24*60*60;
 
-    fprintf(stderr, "state changed: %d\n",cur_state);
   } else {
+    ccnt = config_getcnt("yx.so", "channel");
     if ((cur_state == YX_IRC || cur_state == YX_KDF)
-	&& rrand(50000) == 1337)
-      irc_privmsg(chan, "%s", msg[rrand(length(msg))]);
+	&& ccnt > 0 && rrand(5000/ccnt) == 1)
+      switch(rrand(3)) {
+        case 0:
+          n = config_getcnt("yx.so", "talk");
+          if (n > 0)
+            irc_privmsg(config_getn("yx.so", "channel", rrand(ccnt)), "%s",
+		config_getn("yx.so", "talk", rrand(n)));
+          break;
+        case 1:
+          n = config_getcnt("yx.so", "recommend");
+          if (n > 0)
+            irc_privmsg(config_getn("yx.so", "channel", rrand(ccnt)),
+            	"Dr. Keke recommends %s", 
+		config_getn("yx.so", "recommend", rrand(n)));
+          break;
+        case 2:
+          n = config_getcnt("yx.so", "pizza");
+          t = config_getcnt("yx.so", "topping");
+          l = config_getcnt("yx.so", "like");
+          if (n > 0 && t > 0 && l > 0)
+	    irc_privmsg(config_getn("yx.so", "channel", rrand(ccnt)), 
+          	"%s mit %s, %s und %s %s",
+		config_getn("yx.so", "pizza", rrand(n)),
+		config_getn("yx.so", "topping", rrand(t)),
+		config_getn("yx.so", "topping", rrand(t)),
+		config_getn("yx.so", "topping", rrand(t)),
+		config_getn("yx.so", "like", rrand(l)));
+          break;
+      }
   }
 }
 
 int reply(info_t * in) {
-  char *msg[] = {
-    "kerker",
-    "was? :<",
-    "stell mal bier kalt",
-    "bierli reingefüllt?",
-    "dank UBANTO lunix",
-    ";S",
-    "ofenfrische hawaii mit 100g bonus mozzarella kommt urgut",
-    "danke",
-  };
-
+  int n;
+  int ccnt;
   if (in->cmd == cmd_numeric && in->numeric == 1) {
-    irc_send("JOIN %s", chan);
+    ccnt = config_getcnt("yx.so", "channel");
+    for (n = 0; n < ccnt; ++n)
+    	irc_send("JOIN %s", config_getn("yx.so", "channel", n));
   } else if (in->cmd == cmd_join
-    && !strcasecmp(chan, (in->argv[0])?in->argv[0]:in->tail)) {
+    && isyxchannel(in->argv[0]?in->argv[0]:in->tail)) {
     if ((cur_state == YX_IRC || cur_state == YX_KDF) 
         && strcasecmp(in->me, in->sender_nick)) {
-      irc_privmsg(chan, "%s", in->sender_nick);
-      irc_privmsg(chan, "hallu");
+      irc_privmsg(in->argv[0]?in->argv[0]:in->tail, "%s", in->sender_nick);
+      irc_privmsg(in->argv[0]?in->argv[0]:in->tail, "hallu");
     }
   } else if (in->cmd == cmd_privmsg) {
     in->tail = skip_nick(in->tail, in->me);
@@ -155,9 +176,11 @@ int reply(info_t * in) {
         yx_state_str[cur_state], (change_state - time(NULL)) / 60);
     } else if ((cur_state == YX_IRC || cur_state == YX_KDF)
         && is_channel(in->argv[0])
-        && !strcasecmp(in->argv[0], chan)) {
-      if (rrand(80) == 23) {
-        irc_privmsg(chan, "%s: %s", in->sender_nick, msg[rrand(length(msg))]);
+        && isyxchannel(in->argv[0])) {
+      n = config_getcnt("yx.so", "reply");
+      if (n > 0 && rrand(80) == 23) {
+        irc_privmsg(in->argv[0], "%s: %s", in->sender_nick, 
+			config_getn("yx.so", "reply", rrand(n)));
       }
     }
   }
