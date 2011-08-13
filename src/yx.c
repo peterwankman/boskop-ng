@@ -123,7 +123,7 @@ void timer(unsigned long ts) {
   } else {
     ccnt = config_getcnt("yx.so", "channel");
     if ((cur_state == YX_IRC || cur_state == YX_KDF)
-	&& ccnt > 0 && rrand(5000/ccnt) == 1)
+	&& ccnt > 0 && rrand(25000/ccnt) == 1)
       switch(rrand(3)) {
         case 0:
           n = config_getcnt("yx.so", "talk");
