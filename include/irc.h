@@ -32,6 +32,12 @@ int irc_canread(void *ptr);
 int irc_sendbuf_now(const char *buf, int len);
 int irc_sendbuf(const char *buf, int len);
 int irc_send(const char *fmt, ...);
+
+/* added by sird 15.08.11 */
+int irc_kick(const char *channel, const char *target, const char *msg, ...);
+int irc_mode(const char *target, const char *mode);
+/* end added by sird */
+
 int irc_privmsg(const char *target, const char *msg, ...);
 int irc_notice(const char *target, const char *msg, ...);
 int irc_query(const char *module, ...);

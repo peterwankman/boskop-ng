@@ -84,9 +84,49 @@ int irc_send(const char *fmt, ...) {
    va_start(ap, fmt);
    len = vsnprintf(buf, sizeof(buf), fmt, ap);
    va_end(ap);
+
    if (len > sizeof(buf))
       return -1;
+
    len += snprintf(&buf[len], sizeof(buf)-len, "\r\n");
+   if (len > sizeof(buf))
+      return -1;
+
+   return irc_sendbuf(buf, len);
+}
+
+int irc_kick(const char *channel, const char *target, const char *msg, ...)
+{
+   char buf[BUFLEN+1];
+   va_list ap;
+   int len;
+
+   len = snprintf(buf, sizeof(buf), "KICK %s %s :", channel, target);
+   if (len > sizeof(buf))
+      return -1;
+
+   va_start(ap, msg);
+   len += vsnprintf(&buf[len], sizeof(buf)-len, msg, ap);
+   va_end(ap);
+
+   if (len > sizeof(buf))
+      return -1;
+
+   len += snprintf(&buf[len], sizeof(buf)-len, "\r\n");
+   if (len > sizeof(buf))
+      return -1;
+   
+   return irc_sendbuf(buf, len);
+}
+
+/* start added by sird 15.08.11 */
+
+int irc_mode(const char *target, const char *mode)
+{
+   char buf[BUFLEN+1];
+   int len;
+
+   len = snprintf(buf, sizeof(buf), "MODE %s %s", target, mode);
    if (len > sizeof(buf))
       return -1;
    return irc_sendbuf(buf, len);
@@ -103,13 +143,19 @@ int irc_privmsg(const char *target, const char *msg, ...)
       return -1;
    va_start(ap, msg);
    len += vsnprintf(&buf[len], sizeof(buf)-len, msg, ap);
+   va_end(ap);
+
    if (len > sizeof(buf))
       return -1;
+
    len += snprintf(&buf[len], sizeof(buf)-len, "\r\n");
    if (len > sizeof(buf))
       return -1;
+
    return irc_sendbuf(buf, len);
 }
+
+/* end added by sird */
 
 int irc_notice(const char *target, const char *msg, ...)
 {
@@ -122,11 +168,15 @@ int irc_notice(const char *target, const char *msg, ...)
       return -1;
    va_start(ap, msg);
    len += vsnprintf(&buf[len], sizeof(buf)-len, msg, ap);
+   va_end(ap);
+
    if (len > sizeof(buf))
       return -1;
+
    len += snprintf(&buf[len], sizeof(buf)-len, "\r\n");
    if (len > sizeof(buf))
       return -1;
+
    return irc_sendbuf(buf, len);
 }
 
