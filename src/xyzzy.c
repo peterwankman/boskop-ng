@@ -28,7 +28,7 @@
 
 int reply(info_t * in) {
 	if (in->cmd == cmd_privmsg && !tail_cmd(&in->tail,"xyzzy"))
-		irc_privmsg(to_sender(in), rrand(2)?"%s: Nothging happens.":
+		irc_privmsg(to_sender(in), rrand(2)?"%s: Nothing happens.":
 			"%s: Twice as much happens.", in->sender_nick);
 
 	return 0;
