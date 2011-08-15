@@ -122,6 +122,20 @@ int init() {
 		QAUTH_SIMPLE: QAUTH_CHALLENGE;
 	free(mode);
 
+	if(!qauth.user) {
+		warn("qauth.so: \"user\" not set.\n");
+		if(qauth.pass)
+			free(qauth.pass);
+		return 0;		
+	}
+
+	if(!qauth.pass) {
+		warn("qauth.so: \"pass\" not set.\n");
+		if(qauth.user)
+			free(qauth.user);
+		return 0;		
+	}
+
 	ctolower(qauth.user);
 	
 	qauth.hide = strncasecmp(config_get("qauth.so", "hide"), "y", 1)?0:1;
