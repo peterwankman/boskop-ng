@@ -182,6 +182,7 @@ nickserv.so {
 }
 
 yx.so {
+   unlikelihood: 50000;
    channel: "#scheme";
 
    reply: "kerker";

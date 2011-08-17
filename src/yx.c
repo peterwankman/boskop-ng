@@ -51,7 +51,7 @@ char *yx_state_str[] = {
 
 
 enum yx_state cur_state;
-unsigned long change_state;
+unsigned long change_state, unlikelihood;
 
 int isyxchannel(const char *chan)
 {
@@ -123,7 +123,7 @@ void timer(unsigned long ts) {
   } else {
     ccnt = config_getcnt("yx.so", "channel");
     if ((cur_state == YX_IRC || cur_state == YX_KDF)
-	&& ccnt > 0 && rrand(100000/ccnt) == 1)
+	&& ccnt > 0 && rrand(unlikelihood/ccnt) == 1)
       switch(rrand(3)) {
         case 0:
           n = config_getcnt("yx.so", "talk");
@@ -190,9 +190,18 @@ int reply(info_t * in) {
 int init(void) {
   unsigned long t;
   struct tm now;
+  char *buf;
 
   time((time_t*)&t);
   localtime_r((time_t*)&t, &now);
+
+  buf = config_get("yx.so", "unlikelihood");
+  if(buf) {
+    unlikelihood = (unsigned long)atol(buf);
+    free(buf);
+  } else {
+    unlikelihood = 50000;
+  }
   
   if (now.tm_hour >= 20 || now.tm_hour < 6) {
     cur_state = YX_KDF;
