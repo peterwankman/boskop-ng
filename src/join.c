@@ -32,8 +32,8 @@
 #include "auth.h"
 #include "join.h"
 
-#define REJOIN_FREQ 60
-#define MAX_RETRIES 3
+#define REJOIN_FREQ 181
+#define MAX_RETRIES 5
 
 int max_retries;
 int rejoin_freq;
