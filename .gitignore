@@ -1,0 +1,16 @@
+Makefile
+stamp-h1
+config.h
+config.log
+config.status
+.deps
+*.o
+*.so
+*.db
+confpar.c
+confpar.h
+confsym.c
+confsym.h
+boskop-ng
+boskop.conf
+fortune.txt

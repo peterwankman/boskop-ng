@@ -198,7 +198,6 @@ int init(void) {
   buf = config_get("yx.so", "unlikelihood");
   if(buf) {
     unlikelihood = (unsigned long)atol(buf);
-    free(buf);
   } else {
     unlikelihood = 50000;
   }
