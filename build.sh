@@ -8,12 +8,12 @@ export CPPFLAGS="-I/usr/include/libxml2 -O0 -ggdb $ADD"
 
 svn up
 
-if [[ $1 == "--cross" ]]; then
+if [ $1 == "--cross" ]; then
 	CHOST=arm-unknown-linux-gnu
 	shift 1
 fi
 
-if [[ $1 == --clean ]]; then
+if [ $1 == --clean ]; then
 	aclocal
 	autoheader
 	autoconf

@@ -17,7 +17,7 @@ AM_CPPFLAGS += -DTLS
 endif
 
 bin_PROGRAMS = boskop-ng 
- mod_PROGRAMS = alignment.so ping.so join.so weil.so invite.so auth.so blinddate.so talk.so decide.so tourette.so quit.so nick.so hello.so version.so qauth.so horde.so jukebox.so love.so sercz.so scheme.so quote.so reminder.so eliza.so plugin.so nickserv.so achtball.so fortune.so help.so xyzzy.so yx.so
+ mod_PROGRAMS = alignment.so ping.so join.so weil.so invite.so auth.so blinddate.so talk.so decide.so tourette.so quit.so nick.so hello.so version.so qauth.so horde.so jukebox.so love.so sercz.so scheme.so quote.so reminder.so eliza.so plugin.so nickserv.so achtball.so fortune.so help.so xyzzy.so yx.so fut.so
 if ENABLE_XML
 mod_PROGRAMS += rss.so search.so weather.so
 endif
@@ -181,4 +181,8 @@ xyzzy_so_LDFLAGS = -shared
 yx_so_SOURCES = yx.c
 yx_so_CFLAGS = -fPIC
 yx_so_LDFLAGS = -shared
+
+fut_so_SOURCES = fut.c
+fut_so_CFLAGS = -fPIC
+fut_so_LDFLAGS = -shared
 
