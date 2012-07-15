@@ -62,6 +62,10 @@ static LIST_HEAD(channels);
 
 static char uflag2chr(int flags)
 {
+   if (flags & UFL_OWNER)
+      return '*';
+   if (flags & UFL_ADMIN)
+      return '!';
    if (flags & UFL_OP)
       return '@';
    if (flags & UFL_HOP)
@@ -73,7 +77,7 @@ static char uflag2chr(int flags)
 
 static inline int is_userflag(char c)
 {
-   if (c == '@' || c == '%' || c == '+')
+   if (c == '*' || c == '!' || c == '@' || c == '%' || c == '+')
       return 1;
    return 0;
 }
@@ -111,7 +115,14 @@ static member_t *member_add(channel_t *ch, const char *nick, const char *user, c
       return NULL;
 
    m->flags = flags;
-   
+   while(*nick == '*') {
+     m->flags |= UFL_OWNER;
+     ++nick;   
+   }
+   while(*nick == '!') {
+     m->flags |= UFL_ADMIN;
+     ++nick;
+   }
    while(*nick == '@') {
       m->flags |= UFL_OP;
       ++nick;
@@ -249,6 +260,14 @@ static void channel_modes(channel_t *ch, const char *mode, const char **argv)
    if (mode[0] == '+') {
       while (*mo) {
          switch(*mo) {
+            case 'q':
+              if ((m = member_find(ch, argv[ind++])))
+                m->flags |= UFL_OWNER;
+              break;
+            case 'a':
+              if ((m = member_find(ch, argv[ind++])))
+                m->flags |= UFL_ADMIN;
+              break;
             case 'o':
                if ((m = member_find(ch, argv[ind++])))
                   m->flags |= UFL_OP;
@@ -294,7 +313,15 @@ static void channel_modes(channel_t *ch, const char *mode, const char **argv)
    } else if (mode[0] == '-') {
       while (*mo) {
          switch(*mo) {
-               case 'o':
+            case 'q':
+              if ((m = member_find(ch, argv[ind++])))
+                m->flags &= ~UFL_OWNER;
+              break;
+            case 'a':
+              if ((m = member_find(ch, argv[ind++])))
+                m->flags &= ~UFL_ADMIN;
+              break;
+            case 'o':
                if ((m = member_find(ch, argv[ind++])))
                   m->flags &= ~UFL_OP;
                break;

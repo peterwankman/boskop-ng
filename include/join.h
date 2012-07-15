@@ -24,6 +24,8 @@
 #ifndef JOIN_H_
 #define JOIN_H_
 
+#define UFL_OWNER     0x10
+#define UFL_ADMIN     0x08
 #define UFL_OP        0x04
 #define UFL_HOP       0x02
 #define UFL_VOICE     0x01
