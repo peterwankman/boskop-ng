@@ -200,6 +200,12 @@ int irc_query(const char *module, ...)
 
 int irc_reg(void)
 {
+	char *pass = config_get("core", "pass");
+	
+	if(pass)
+		if (irc_send("PASS %s", pass) == -1)
+			return -1;
+	
 	if (irc_send("NICK %s", config_get("core", "nick")) == -1)
 		return -1;
 	if (irc_send("USER %s 0 0 :%s", config_get("core", "user"), config_get("core", "realname")) == -1)
