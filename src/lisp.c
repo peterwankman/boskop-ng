@@ -88,6 +88,7 @@ static char *fmt_data(const data_t *d) {
 	if((out = malloc(len + 1)) == NULL) {
 		return NULL;
 	}
+	memset(out, 0, len + 1);
 	fmt_data_rec(d, out, 1);
 
 	return out;
