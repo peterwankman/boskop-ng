@@ -127,7 +127,7 @@ int reply(info_t *in) {
 	char *exp;
 
 	if(in->cmd == cmd_privmsg && !tail_cmd(&in->tail, "eval")) {
-		exp = tail_getp(&in->tail);
+		exp = in->tail;
 		if(exp)
 			runexp(exp, in);
 		else
