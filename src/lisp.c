@@ -120,7 +120,7 @@ static void runexp(char *exp, info_t *in) {
 		
 		if(reclaimed = run_gc(GC_LOWMEM))
 			irc_privmsg(to_sender(in), "GC: %d bytes reclaimed.", reclaimed);
-	} while(strlen(exp));
+	} while(strlen(exp) && !error);
 }
 
 int reply(info_t *in) {
