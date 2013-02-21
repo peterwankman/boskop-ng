@@ -140,13 +140,13 @@ int init(void) {
 	char *p;
 	int i;
 
-	p = config_get("lisp.so", "mem_lim_soft");
+	p = config_get("lisp.so", "softlimit");
 	if(p && (i = atoi(p)) > 0)
 		mem_lim_soft = i;
 	else
 		mem_lim_soft = 786432;
 
-	p = config_get("lisp.so", "mem_lim_hard");
+	p = config_get("lisp.so", "hardlimit");
 	if(p && (i = atoi(p)) > 0)
 		mem_lim_hard = i;
 	else
