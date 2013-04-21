@@ -14,3 +14,5 @@ confsym.h
 boskop-ng
 boskop.conf
 fortune.txt
+autom4te.cache
+*~

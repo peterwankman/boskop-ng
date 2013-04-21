@@ -17,9 +17,12 @@ AM_CPPFLAGS += -DTLS
 endif
 
 bin_PROGRAMS = boskop-ng 
- mod_PROGRAMS = alignment.so ping.so join.so weil.so invite.so auth.so blinddate.so talk.so decide.so tourette.so quit.so nick.so hello.so version.so qauth.so horde.so jukebox.so love.so sercz.so scheme.so quote.so reminder.so eliza.so plugin.so nickserv.so achtball.so fortune.so help.so xyzzy.so yx.so fut.so
+mod_PROGRAMS = alignment.so ping.so join.so weil.so invite.so auth.so blinddate.so talk.so decide.so tourette.so quit.so nick.so hello.so version.so qauth.so horde.so jukebox.so love.so sercz.so scheme.so quote.so reminder.so eliza.so plugin.so nickserv.so achtball.so fortune.so help.so xyzzy.so yx.so fut.so
 if ENABLE_XML
 mod_PROGRAMS += rss.so search.so weather.so
+endif
+if ENABLE_LISP
+mod_PROGRAMS += lisp.so
 endif
 
 boskop_ng_SOURCES = confpar.y confsym.l sha1.c hmac.c irc.c io.c buffer.c util.c plugins.c main.c dns.c http.c rrand.c sock.c
@@ -133,6 +136,13 @@ horde_so_LDFLAGS = -shared
 jukebox_so_SOURCES = jukebox.c
 jukebox_so_CFLAGS = -fPIC
 jukebox_so_LDFLAGS = -shared
+
+lisp_so_SOURCE = lisp.c
+lisp_so_CFLAGS = -fPIC -I../contrib/libisp/include
+lisp_so_LDFLAGS = -shared
+lisp_so_LDADD = ../contrib/libisp/bin/libisp.a
+../contrib/libisp/bin/libisp.a:
+	$(MAKE) -C ../contrib/libisp/ bin/libisp.a
 
 love_so_SOURCES = love.c
 love_so_CFLAGS = -fPIC

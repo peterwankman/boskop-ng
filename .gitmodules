@@ -1,0 +1,3 @@
+[submodule "contrib/libisp"]
+	path = contrib/libisp
+	url = https://github.com/SirDzstic/libisp.git
