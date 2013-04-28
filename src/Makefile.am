@@ -140,7 +140,7 @@ jukebox_so_LDFLAGS = -shared
 lisp_so_SOURCE = lisp.c
 lisp_so_CFLAGS = -fPIC -I../contrib/libisp/include
 lisp_so_LDFLAGS = -shared
-lisp_so_LDADD = ../contrib/libisp/bin/libisp.a
+lisp_so_LDADD = ../contrib/libisp/bin/libisp.a -lpthread
 ../contrib/libisp/bin/libisp.a:
 	$(MAKE) -C ../contrib/libisp/ bin/libisp.a
 
