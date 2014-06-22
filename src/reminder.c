@@ -95,7 +95,7 @@ int reply(info_t * in) {
                duration *= 3600;
                break;
          }
-         if (duration > 86400) {
+         if (duration > 31536000) {
             irc_notice(in->sender_nick, "Duration too long");
             return 0;
          }
