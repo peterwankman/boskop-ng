@@ -8,9 +8,12 @@
 #include "util.h"
 #include "conf.h"
 
-extern data_t *the_global_env;
+#define THREAD_TIMEOUT	2
+static lisp_ctx_t *context;
+int is_compound_procedure(const data_t *exp);
 
-size_t fmt_data_rec(const data_t *d, char *out, int print_parens) {
+size_t fmt_data_rec(const data_t *d, char *out, int print_parens, 
+					lisp_ctx_t *context) {
 	data_t *head, *tail;
 	size_t s = 0;
 
@@ -18,7 +21,7 @@ size_t fmt_data_rec(const data_t *d, char *out, int print_parens) {
 		if(out) sprintf(out, "%s()", out);
 		s += 2;
 	}
-	else if(d == the_global_env) {
+	else if(d == context->the_global_environment) {
 		if(out) sprintf(out, "%s<env>", out);
 		s += 5;
 	} else {
@@ -28,20 +31,24 @@ size_t fmt_data_rec(const data_t *d, char *out, int print_parens) {
 				s += 6; 
 				break;
 			case integer: 
-				if(out)	sprintf(out, "%s%d", out, d->val.integer); 
+				if(out)	sprintf(out, "%s%d", out, d->integer); 
 				s += 10; 
 				break;
 			case decimal:
-				if(out)	sprintf(out, "%s%g", out, d->val.decimal); 
+				if(out)	sprintf(out, "%s%g", out, d->decimal); 
 				s += 16; 
 				break;
 			case symbol:
-				if(out) sprintf(out, "%s%s", out, d->val.symbol); 
-				s += strlen(d->val.symbol); 
+				if(out) sprintf(out, "%s%s", out, d->symbol); 
+				s += strlen(d->symbol); 
 				break;
 			case string: 
-				if(out) sprintf(out, "%s\"%s\"", out, d->val.string);
-				s += 2 + strlen(d->val.string);
+				if(out) sprintf(out, "%s\"%s\"", out, d->string);
+				s += 2 + strlen(d->string);
+				break;
+			case error:
+				if(out) sprintf(out, "%sERROR: \"%s\"", out, d->error);
+				s += 9 + strlen(d->error);
 				break;
 			case pair:
 				if(is_compound_procedure(d)) {
@@ -59,16 +66,16 @@ size_t fmt_data_rec(const data_t *d, char *out, int print_parens) {
 				tail = cdr(d);
 
 				if(tail) {
-					s += fmt_data_rec(head, out, 1);
+					s += fmt_data_rec(head, out, 1, context);
 					if(tail->type != pair) {
 						if(out) sprintf(out, "%s . ", out);
-						s += 3 + fmt_data_rec(tail, out, 1);
+						s += 3 + fmt_data_rec(tail, out, 1, context);
 					} else {
 						if(out) sprintf(out, "%s ", out);
-						s += 1 + fmt_data_rec(tail, out, 0);
+						s += 1 + fmt_data_rec(tail, out, 0, context);
 					}
 				} else {
-					s += fmt_data_rec(head, out, 1);
+					s += fmt_data_rec(head, out, 1, context);
 				}
 
 				if(print_parens) {
@@ -80,16 +87,16 @@ size_t fmt_data_rec(const data_t *d, char *out, int print_parens) {
 	return s;
 }
 
-static char *fmt_data(const data_t *d) {
+static char *fmt_data(const data_t *d, lisp_ctx_t *context) {
 	char *out;
 	size_t len;
 
-	len = fmt_data_rec(d, NULL, 1);
+	len = fmt_data_rec(d, NULL, 1, context);
 	if((out = malloc(len + 1)) == NULL) {
 		return NULL;
 	}
 	memset(out, 0, len + 1);
-	fmt_data_rec(d, out, 1);
+	fmt_data_rec(d, out, 1, context);
 
 	return out;
 }
@@ -101,13 +108,13 @@ static void runexp(char *exp, info_t *in) {
 	char *retchar;
 
 	do {
-		exp_list = read_exp(exp, &readto, &error);
+		exp_list = read_exp(exp, &readto, &error, context);
 		
 		if(error) {
 			irc_privmsg(to_sender(in), "Syntax Error: '%s'", exp);
 		} else {
-			ret = eval_thread(exp_list, the_global_env);
-			retchar = fmt_data(ret);
+			ret = eval_thread(exp_list, context);
+			retchar = fmt_data(ret, context);
 			if(retchar) {
 				irc_privmsg(to_sender(in), "YHBT: %s", retchar);
 				free(retchar);
@@ -118,7 +125,7 @@ static void runexp(char *exp, info_t *in) {
 
 		exp += readto;
 		
-		if(reclaimed = run_gc(GC_LOWMEM))
+		if(reclaimed = run_gc(GC_LOWMEM, context))
 			irc_privmsg(to_sender(in), "GC: %d bytes reclaimed.", reclaimed);
 	} while(strlen(exp) && !error);
 }
@@ -140,6 +147,8 @@ int init(void) {
 	char *p;
 	int i;
 
+	size_t mem_lim_soft, mem_lim_hard, mem_verbosity;
+
 	p = config_get("lisp.so", "softlimit");
 	if(p && (i = atoi(p)) > 0)
 		mem_lim_soft = i;
@@ -153,11 +162,16 @@ int init(void) {
 		mem_lim_hard = 1048576;
 
 	mem_verbosity = MEM_SILENT;
-	setup_environment();
+
+	context = make_context(mem_lim_soft, mem_lim_hard, mem_verbosity, 
+		THREAD_TIMEOUT);
+	setup_environment(context);
+
+	return 0;
 }
 
 void destroy(void) {
-	cleanup_lisp();
+	destroy_context(context);
 }
 
 PLUGIN_DEF(
