@@ -24,7 +24,7 @@ static int n_ctx = 0;
 static ctx_list_t *ctx_list = NULL;
 static ctx_list_t *ctx_list_head = NULL;
 
-int is_compound_procedure(const data_t *exp);
+int is_compound_procedure(const lisp_data_t *exp);
 
 static ctx_list_t *new_node(const char *name,
 							const size_t mem_lim_soft, 
@@ -40,14 +40,14 @@ static ctx_list_t *new_node(const char *name,
 	}
 
 	strncpy(newnode->name, name, MAX_NAME);
-	if((newnode->context = make_context(mem_lim_soft, mem_lim_hard, 
-										MEM_SILENT, THREAD_TIMEOUT)) == NULL) {
+	if((newnode->context = lisp_make_context(mem_lim_soft, mem_lim_hard, 
+										LISP_GC_SILENT, THREAD_TIMEOUT)) == NULL) {
 		free(newnode->name);
 		free(newnode);
 		return NULL;
 	}
 
-	setup_environment(newnode->context);
+	lisp_setup_env(newnode->context);
 	newnode->next = NULL;
 	return newnode;						
 }
@@ -89,7 +89,7 @@ static void del_node(ctx_list_t *node) {
 	}
 
 	free(node->name);
-	destroy_context(node->context);
+	lisp_destroy_context(node->context);
 	free(node);
 }
 
@@ -144,9 +144,9 @@ static lisp_ctx_t *lookup_ctx(const char *name) {
 	return NULL;
 }
 
-size_t fmt_data_rec(const data_t *d, char *out, int print_parens, 
+size_t fmt_data_rec(const lisp_data_t *d, char *out, int print_parens, 
 					lisp_ctx_t *context) {
-	data_t *head, *tail;
+	lisp_data_t *head, *tail;
 	size_t s = 0;
 
 	if(!d) {
@@ -158,31 +158,31 @@ size_t fmt_data_rec(const data_t *d, char *out, int print_parens,
 		s += 5;
 	} else {
 		switch(d->type) {
-			case prim_procedure: 
+			case lisp_type_prim: 
 				if(out) sprintf(out, "%s<proc>", out);
 				s += 6; 
 				break;
-			case integer: 
+			case lisp_type_integer: 
 				if(out)	sprintf(out, "%s%d", out, d->integer); 
 				s += 10; 
 				break;
-			case decimal:
+			case lisp_type_decimal:
 				if(out)	sprintf(out, "%s%g", out, d->decimal); 
 				s += 16; 
 				break;
-			case symbol:
+			case lisp_type_symbol:
 				if(out) sprintf(out, "%s%s", out, d->symbol); 
 				s += strlen(d->symbol); 
 				break;
-			case string: 
+			case lisp_type_string: 
 				if(out) sprintf(out, "%s\"%s\"", out, d->string);
 				s += 2 + strlen(d->string);
 				break;
-			case error:
+			case lisp_type_error:
 				if(out) sprintf(out, "%sERROR: \"%s\"", out, d->error);
 				s += 9 + strlen(d->error);
 				break;
-			case pair:
+			case lisp_type_pair:
 				if(is_compound_procedure(d)) {
 					if(out) sprintf(out, "%s<proc>", out);
 					s += 6;
@@ -194,12 +194,12 @@ size_t fmt_data_rec(const data_t *d, char *out, int print_parens,
 					s++;
 				}
 
-				head = car(d);
-				tail = cdr(d);
+				head = lisp_car(d);
+				tail = lisp_cdr(d);
 
 				if(tail) {
 					s += fmt_data_rec(head, out, 1, context);
-					if(tail->type != pair) {
+					if(tail->type != lisp_type_pair) {
 						if(out) sprintf(out, "%s . ", out);
 						s += 3 + fmt_data_rec(tail, out, 1, context);
 					} else {
@@ -219,7 +219,7 @@ size_t fmt_data_rec(const data_t *d, char *out, int print_parens,
 	return s;
 }
 
-static char *fmt_data(const data_t *d, lisp_ctx_t *context) {
+static char *fmt_data(const lisp_data_t *d, lisp_ctx_t *context) {
 	char *out;
 	size_t len;
 
@@ -234,18 +234,18 @@ static char *fmt_data(const data_t *d, lisp_ctx_t *context) {
 }
 
 static void runexp(char *exp, info_t *in, lisp_ctx_t *context) {
-	data_t *exp_list, *ret;
+	lisp_data_t *exp_list, *ret;
 	size_t readto, reclaimed;
 	int error;
 	char *retchar;
 
 	do {
-		exp_list = read_exp(exp, &readto, &error, context);
+		exp_list = lisp_read(exp, &readto, &error, context);
 		
 		if(error) {
 			irc_privmsg(to_sender(in), "Syntax Error: '%s'", exp);
 		} else {
-			ret = eval_thread(exp_list, context);
+			ret = lisp_eval(exp_list, context);
 			retchar = fmt_data(ret, context);
 			if(retchar) {
 				irc_privmsg(to_sender(in), "YHBT: %s", retchar);
@@ -257,7 +257,7 @@ static void runexp(char *exp, info_t *in, lisp_ctx_t *context) {
 
 		exp += readto;
 		
-		if(reclaimed = run_gc(GC_LOWMEM, context))
+		if(reclaimed = lisp_gc(LISP_GC_LOWMEM, context))
 			irc_privmsg(to_sender(in), "GC: %d bytes reclaimed.", reclaimed);
 	} while(strlen(exp) && !error);
 }
@@ -360,9 +360,9 @@ int init(void) {
 	else
 		mem_lim_hard = 1048576;
 
-	global_ctx = make_context(mem_lim_soft, mem_lim_hard, MEM_SILENT, 
+	global_ctx = lisp_make_context(mem_lim_soft, mem_lim_hard, LISP_GC_SILENT,
 									THREAD_TIMEOUT);
-	setup_environment(global_ctx);
+	lisp_setup_env(global_ctx);
 
 	return 0;
 }
@@ -375,7 +375,7 @@ void destroy(void) {
 		del_node(currnode);
 		currnode = nextnode;
 	}
-	destroy_context(global_ctx);
+	lisp_destroy_context(global_ctx);
 }
 
 PLUGIN_DEF(

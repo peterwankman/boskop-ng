@@ -505,7 +505,7 @@ int reply(info_t * in) {
       while (in->tail && in->tail[0]) {
          if ((p = strchr(in->tail, ' ')))
             *(p++) = '\0';
-            member_add(ch, in->tail, NULL, NULL, 0);
+         member_add(ch, in->tail, NULL, NULL, 0);
          in->tail = p;
       }
       irc_send("MODE %s", ch->name);

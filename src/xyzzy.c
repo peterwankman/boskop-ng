@@ -24,6 +24,7 @@
 #include <stdlib.h>
 
 #include "irc.h"
+#include "rrand.h"
 #include "util.h"
 
 int reply(info_t * in) {

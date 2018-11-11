@@ -22,6 +22,8 @@
  */
 
 #include <string.h>
+#include <time.h>
+
 #include "irc.h"
 #include "auth.h"
 #include "util.h"

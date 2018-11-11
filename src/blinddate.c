@@ -50,7 +50,7 @@ static int mmemcpy(char **dest, const char *src, int len, int *free)
 static void talk(int nnick, char *line, info_t *in) {
    char buf[BUFSIZ];
    char *m, *o, *rp = line, *wp = buf;
-   int len, free = BUFSIZ-1;
+   int free = BUFSIZ-1;
 
    if (strlen(in->me) && strlen(nick[nnick?0:1]) 
 	   && strcasecmp(in->me, nick[nnick?0:1])) {
@@ -71,7 +71,7 @@ static void talk(int nnick, char *line, info_t *in) {
       }
    }
    }
-   len = mmemcpy(&wp, rp, strlen(rp), &free);
+   mmemcpy(&wp, rp, strlen(rp), &free);
    *wp = '\0';
 
    irc_privmsg(nick[nnick], "%s", buf);

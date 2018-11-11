@@ -149,7 +149,7 @@ int secure_it(char *path, char *usr)
 }
 
 int main(int argc, char **argv) {
-   int ret, opt, conn, plugins_loaded = 0, banner_displayed = 0;
+   int ret, opt, plugins_loaded = 0, banner_displayed = 0;
    unsigned long now, lastconn = time(NULL);
    FILE *urandom;
 
@@ -265,7 +265,6 @@ int main(int argc, char **argv) {
          runlevel = RL_RUNNING;
       }
 
-      conn = 0;
       now = time(NULL);
       if(runlevel != RL_OFFLINE) {
         runlevel = RL_RUNNING;

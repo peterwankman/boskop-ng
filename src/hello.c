@@ -45,7 +45,7 @@ static hello_t helloinfo;
 
 int reply(info_t * in) {
    time_t now = time(NULL);
-   int i, j;
+   int i;
    
    if (helloinfo.last + helloinfo.interval > now)
       return 0;
